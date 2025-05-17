@@ -1,7 +1,7 @@
 # src/gmm.py
 import numpy as np
 from scipy.stats import multivariate_normal
-from src.utils import initialize_parameters
+from emgmm.utils import initialize_parameters
 
 class GMM:
     def __init__(self, n_components=2, max_iter=100, tol=1e-4, init_method="kmeans", verbose=False):
@@ -17,6 +17,13 @@ class GMM:
         self.covariances_ = None    # Σ_k (matrices de covarianza)
         self.log_likelihood_ = []   # Log-likelihood por iteración
 
+        self.history_ = {
+            "means": [],
+            "covariances": [],
+            "labels": []
+        }
+
+
     def fit(self, X):
         """
         Entrena el modelo GMM usando el algoritmo EM.
@@ -31,7 +38,14 @@ class GMM:
             gamma = self._e_step(X)
 
             # M-step: actualizar parámetros
+            
             self._m_step(X, gamma)
+
+            labels = np.argmax(gamma, axis=1)
+            self.history_["means"].append(self.means_.copy())
+            self.history_["covariances"].append(self.covariances_.copy())
+            self.history_["labels"].append(labels)
+
 
             # Log-verosimilitud
             ll = self._compute_log_likelihood(X)
@@ -71,7 +85,8 @@ class GMM:
         gamma = np.zeros((N, self.n_components))
 
         for k in range(self.n_components):
-            mvn = multivariate_normal(mean=self.means_[k], cov=self.covariances_[k])
+            mvn = multivariate_normal(mean=self.means_[k], cov=self.covariances_[k], allow_singular=True)
+
             gamma[:, k] = self.weights_[k] * mvn.pdf(X)
 
         gamma /= gamma.sum(axis=1, keepdims=True)
@@ -88,6 +103,7 @@ class GMM:
         for k in range(self.n_components):
             diff = X - self.means_[k]
             cov = (gamma[:, k][:, np.newaxis] * diff).T @ diff / Nk[k]
+            cov += 1e-6 * np.eye(D)
             self.covariances_.append(cov)
 
         self.covariances_ = np.array(self.covariances_)
@@ -101,4 +117,8 @@ class GMM:
             total += self.weights_[k] * mvn.pdf(X)
 
         return np.sum(np.log(total))
+
+
+
+
 
