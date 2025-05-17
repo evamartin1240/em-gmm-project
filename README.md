@@ -90,10 +90,12 @@ pip install -r requirements.txt
 
 ## Visualizing EM Convergence
 
+## Visualizing EM Convergence
+
 Below are two examples of EM convergence on synthetic data:
 
-**KMeans Initialization**
-![KMeans Init](figures/animation_kmeans.gif)
+**KMeans Initialization**  
+<img src="figures/animation_kmeans.gif" width="600"/>
 
-**Random Initialization**
-![Random Init](figures/animation_random.gif)
+**Random Initialization**  
+<img src="figures/animation_random.gif" width="600"/>
