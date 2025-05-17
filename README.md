@@ -15,7 +15,8 @@ This repository contains an implementation of the Expectation-Maximization (EM) 
 ```
 em-gmm-project/
 │
-├── emgmm/                      # Source code for EM and helper functions
+├── emgmm/                      # Source code as a Python package
+│   ├── __init__.py
 │   ├── gmm.py                  # EM algorithm implementation
 │   └── utils.py                # Initialization and utility functions
 │
@@ -23,7 +24,6 @@ em-gmm-project/
 │   ├── 01_em_gmm_demo.ipynb            # Synthetic data experiments
 │   ├── 02_real_data_gmm.ipynb          # Application on real data
 │   ├── 03_highdim_gmm.ipynb            # Experiments with full feature set
-│   └── 04_subset_features_gmm.ipynb    # Feature selection experiments
 │
 ├── figures/                    # Plots and visualizations
 │
@@ -32,29 +32,46 @@ em-gmm-project/
 │   └── sections/
 │
 ├── requirements.txt            # Project dependencies
+├── setup.py                    # Package configuration
 └── README.md
 ```
 
 ## Installation
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/your-username/em-gmm-project.git
-   cd em-gmm-project
-   ```
+To install the project as a local package in editable mode:
 
-2. (Optional) Create a virtual environment:
-   ```
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+```bash
+git clone https://github.com/your-username/em-gmm-project.git
+cd em-gmm-project
+pip install -e .
+```
 
-3. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+## Usage Example
 
-4. Open and run the notebooks using Jupyter or JupyterLab.
+Once installed, you can use the GMM implementation from any script or notebook:
+
+```python
+from emgmm import GMM
+from sklearn.datasets import make_blobs
+
+# Generate synthetic data
+X, _ = make_blobs(n_samples=300, centers=3, cluster_std=1.0, random_state=42)
+
+# Fit GMM
+model = GMM(n_components=3, init_method="kmeans")
+model.fit(X)
+
+# Predict clusters
+labels = model.predict(X)
+```
+
+For detailed usage, refer to the notebooks in the `notebooks/` folder.
+
+## Notebooks
+
+- `01_em_gmm_demo.ipynb`: Basic EM implementation on synthetic data
+- `02_real_data_gmm.ipynb`: Application on Breast Cancer dataset
+- `03_highdim_gmm.ipynb`: Using full 30-dimensional dataset
 
 ## Dependencies
 
@@ -65,11 +82,18 @@ em-gmm-project/
 - Scikit-learn
 - Jupyter
 
-## Credits
+Install all dependencies with:
 
-This project was developed by Eva Martín as part of the Algorithms and Data Mining course in the MDS program at Universitat Politècnica de Catalunya (UPC).
+```bash
+pip install -r requirements.txt
+```
 
-## License
+## Visualizing EM Convergence
 
-This repository is intended for academic and research use only. Please contact the author for permission if you plan to reuse or adapt this work in other contexts.
+Below are two examples of EM convergence on synthetic data:
 
+**KMeans Initialization**
+![KMeans Init](figures/animation_kmeans.gif)
+
+**Random Initialization**
+![Random Init](figures/animation_random.gif)
